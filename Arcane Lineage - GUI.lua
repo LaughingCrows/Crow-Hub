@@ -183,10 +183,14 @@ local Tab = Window:CreateTab("Teleports")
         Flag = "Dropdown1",
         Callback = function(Option)
             local NPC = Option[1]
-            if NPC == "Aretim" then
-                game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.NPCs[NPC].CFrame
-            else
-                game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.NPCs[NPC].HumanoidRootPart.CFrame
+            for i, v in pairs(game:GetService("Workspace"):GetDescendants()) do
+                if v.Name == NPC then
+                    if v:FindFirstChild("HumanoidRootPart") then
+                        game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame
+                    else
+                        game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame
+                    end
+                end        
             end
         end,
     })
@@ -200,17 +204,6 @@ local Tab = Window:CreateTab("Teleports")
         Callback = function(Option)
             local NPC = Option[1]
             game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.NPCs[NPC].HumanoidRootPart.CFrame
-        end,
-    })
-
-    local Dropdown = Tab:CreateDropdown({
-        Name = "All NPCS",
-        Options = {""},
-        CurrentOption = {"None"},
-        MultipleOptions = false,
-        Flag = "Dropdown1",
-        Callback = function(Option)
-            game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = Option.CFrame
         end,
     })
 
