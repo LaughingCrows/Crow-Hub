@@ -72,7 +72,7 @@ local Tab = Window:CreateTab("Combat")
         local Button = Tab:CreateButton({
             Name = "Emergency Respawn (Semi-Godmode)",
             Callback = function()
-            game:GetService("Players").LocalPlayer.Character.Humanoid.Health = 0
+                game:GetService("Players").LocalPlayer.Character.Humanoid.Health = 0
             end,
         })
 
@@ -88,7 +88,7 @@ local Tab = Window:CreateTab("Combat")
                 task.spawn(function()
                     while on_off and task.wait() do
                         if game:GetService("Players").LocalPlayer.PlayerGui.Combat.Block.Visible == true then
-                            for i = 1, 5 do
+                            for i = 1, 3 do
                                 game:GetService("ReplicatedStorage").Remotes.Information.RemoteFunction:FireServer({true, true}, "DodgeMinigame")
                             end
                             game:GetService("Players").LocalPlayer.PlayerGui.Combat.Block.Visible = false
@@ -134,9 +134,21 @@ local Tab = Window:CreateTab("Combat")
                     local Player = game:GetService("Players").LocalPlayer.Character
                     local CombatUI = game:GetService("Players").LocalPlayer.PlayerGui.Combat.MagicQTE
                     local CombatRemote = game:GetService("ReplicatedStorage").Remotes.Information.RemoteFunction
+                    -- Auto Skill
+                    local old_
+                    old_ = hookmetamethod(game, "__namecall", function(self, ...)
+                    if self.Name == "RemoteFunction" and getnamecallmethod() == "FireServer" then
+                        local args = {...}
+                        if args[2] == Weapon.."QTE" then
+                        args[1] = true
+                        return old_(self, unpack(args))
+                        end
+                    end
+                    return old_(self, ...)
+                    end)
                     --// Faster Auto Skill
                     while task.wait() and Option[1] ~= "Disabled" do
-                        if Player:FindFirstChild("FightInProgress") and CombatUI.Visible == true then
+                        if Player:FindFirstChild("FightInProgress") and CombatUI.Visible == true or game:GetService("Players").LocalPlayer.PlayerGui.Combat.SpearQTE:FindFirstChild("Dot") then
                             CombatRemote:FireServer(true, Weapon.."QTE")
                             CombatUI.Visible = false
                         end
@@ -146,24 +158,120 @@ local Tab = Window:CreateTab("Combat")
         })
 
         local Dropdown = Tab:CreateDropdown({
-            Name = "Auto Attack",
+            Name = "Priority 1 Skill",
             Options = AttackSet,
             CurrentOption = {"Disabled"},
             MultipleOptions = false,
-            Flag = "Dropdown2",
+            Flag = "Dropdown1",
             Callback = function(Option)
                 task.spawn(function()
-                    --// Variables
-                    local Ability = Option[1]
-                    local Player = game:GetService("Players").LocalPlayer.Character
-                    local CombatUI = game:GetService("Players").LocalPlayer.PlayerGui.Combat.ActionBG
-                    local CombatRemote = game:GetService("Players").LocalPlayer.PlayerGui.Combat.CombatHandle
-                    --/ Combat Handler
-                    while task.wait(1) and Ability ~= "Disabled" do
-                        if Player:FindFirstChild("FightInProgress") then
+                    while Option[1] ~= "Disabled" and task.wait(1) do
+                        local Skill = Option[1]
+                        local Player = game:GetService("Players").LocalPlayer.Character
+                        local CombatUI = game:GetService("Players").LocalPlayer.PlayerGui.Combat.ActionBG
+                        local CombatRemote = game:GetService("Players").LocalPlayer.PlayerGui.Combat.CombatHandle
+                        local Stm = game:GetService("Players").LocalPlayer.PlayerGui.HUD.Holder.EnergyOutline.Count.Text
+                        local StmTxt = string.gsub(Stm, "/6", "")
+                        local StmInt = tonumber(StmTxt)
+                        local SkillCost = CombatUI.AttacksPage.ScrollingFrame:WaitForChild(Skill).Cost.Text
+                        local SkillCostInt = tonumber(SkillCost)
+                        if Player:FindFirstChild("FightInProgress") and StmInt >= SkillCostInt and CombatUI.AttacksPage.ScrollingFrame[Skill].CD.Visible ~= true then
                             for i, v in ipairs(workspace.Living:GetDescendants()) do
                                 if v.Name == "FightInProgress" and v.Parent ~= Player and v.Value == Player.FightInProgress.Value then
-                                    CombatRemote.RemoteFunction:InvokeServer("Attack", Ability, {["Attacking"] = v.Parent})
+                                    CombatRemote.RemoteFunction:InvokeServer("Attack", Skill, {["Attacking"] = v.Parent})
+                                    CombatUI.Visible = false
+                                end
+                            end
+                        end
+                    end
+                end)
+            end,
+        })
+
+        local Dropdown = Tab:CreateDropdown({
+            Name = "Priority 2 Skill",
+            Options = AttackSet,
+            CurrentOption = {"Disabled"},
+            MultipleOptions = false,
+            Flag = "Dropdown1",
+            Callback = function(Option)
+                task.spawn(function()
+                    while Option[1] ~= "Disabled" and task.wait(1) do
+                        local Skill = Option[1]
+                        local Player = game:GetService("Players").LocalPlayer.Character
+                        local CombatUI = game:GetService("Players").LocalPlayer.PlayerGui.Combat.ActionBG
+                        local CombatRemote = game:GetService("Players").LocalPlayer.PlayerGui.Combat.CombatHandle
+                        local Stm = game:GetService("Players").LocalPlayer.PlayerGui.HUD.Holder.EnergyOutline.Count.Text
+                        local StmTxt = string.gsub(Stm, "/6", "")
+                        local StmInt = tonumber(StmTxt)
+                        local SkillCost = CombatUI.AttacksPage.ScrollingFrame:WaitForChild(Skill).Cost.Text
+                        local SkillCostInt = tonumber(SkillCost)
+                        if Player:FindFirstChild("FightInProgress") and StmInt >= SkillCostInt and CombatUI.AttacksPage.ScrollingFrame[Skill].CD.Visible ~= true then
+                            for i, v in ipairs(workspace.Living:GetDescendants()) do
+                                if v.Name == "FightInProgress" and v.Parent ~= Player and v.Value == Player.FightInProgress.Value then
+                                    CombatRemote.RemoteFunction:InvokeServer("Attack", Skill, {["Attacking"] = v.Parent})
+                                    CombatUI.Visible = false
+                                end
+                            end
+                        end
+                    end
+                end)
+            end,
+        })
+
+        local Dropdown = Tab:CreateDropdown({
+            Name = "Priority 3 Skill",
+            Options = AttackSet,
+            CurrentOption = {"Disabled"},
+            MultipleOptions = false,
+            Flag = "Dropdown1",
+            Callback = function(Option)
+                task.spawn(function()
+                    while Option[1] ~= "Disabled" and task.wait(1) do
+                        local Skill = Option[1]
+                        local Player = game:GetService("Players").LocalPlayer.Character
+                        local CombatUI = game:GetService("Players").LocalPlayer.PlayerGui.Combat.ActionBG
+                        local CombatRemote = game:GetService("Players").LocalPlayer.PlayerGui.Combat.CombatHandle
+                        local Stm = game:GetService("Players").LocalPlayer.PlayerGui.HUD.Holder.EnergyOutline.Count.Text
+                        local StmTxt = string.gsub(Stm, "/6", "")
+                        local StmInt = tonumber(StmTxt)
+                        local SkillCost = CombatUI.AttacksPage.ScrollingFrame:WaitForChild(Skill).Cost.Text
+                        local SkillCostInt = tonumber(SkillCost)
+                        if Player:FindFirstChild("FightInProgress") and StmInt >= SkillCostInt and CombatUI.AttacksPage.ScrollingFrame[Skill].CD.Visible ~= true then
+                            for i, v in ipairs(workspace.Living:GetDescendants()) do
+                                if v.Name == "FightInProgress" and v.Parent ~= Player and v.Value == Player.FightInProgress.Value then
+                                    CombatRemote.RemoteFunction:InvokeServer("Attack", Skill, {["Attacking"] = v.Parent})
+                                    CombatUI.Visible = false
+                                end
+                            end
+                        end
+                    end
+                end)
+            end,
+        })
+
+        local Dropdown = Tab:CreateDropdown({
+            Name = "Priority 4 Skill",
+            Options = AttackSet,
+            CurrentOption = {"Disabled"},
+            MultipleOptions = false,
+            Flag = "Dropdown1",
+            Callback = function(Option)
+                task.spawn(function()
+                    while Option[1] ~= "Disabled" and task.wait(1) do
+                        local Skill = Option[1]
+                        local Player = game:GetService("Players").LocalPlayer.Character
+                        local CombatUI = game:GetService("Players").LocalPlayer.PlayerGui.Combat.ActionBG
+                        local CombatRemote = game:GetService("Players").LocalPlayer.PlayerGui.Combat.CombatHandle
+                        local Stm = game:GetService("Players").LocalPlayer.PlayerGui.HUD.Holder.EnergyOutline.Count.Text
+                        local StmTxt = string.gsub(Stm, "/6", "")
+                        local StmInt = tonumber(StmTxt)
+                        local SkillCost = CombatUI.AttacksPage.ScrollingFrame:WaitForChild(Skill).Cost.Text
+                        local SkillCostInt = tonumber(SkillCost)
+                        if Player:FindFirstChild("FightInProgress") and StmInt >= SkillCostInt and CombatUI.AttacksPage.ScrollingFrame[Skill].CD.Visible ~= true then
+                            for i, v in ipairs(workspace.Living:GetDescendants()) do
+                                if v.Name == "FightInProgress" and v.Parent ~= Player and v.Value == Player.FightInProgress.Value then
+                                    CombatRemote.RemoteFunction:InvokeServer("Attack", Skill, {["Attacking"] = v.Parent})
                                     CombatUI.Visible = false
                                 end
                             end
@@ -177,7 +285,7 @@ local Tab = Window:CreateTab("Teleports")
 
     local Dropdown = Tab:CreateDropdown({
         Name = "NPCS",
-        Options = {"Aretim", "Eye3", "Blacksmith", "Dealer", "Guild Clerk", "Doctor", "Merchant", "Mysterious Man", "Itinerant", "Krit"},
+        Options = {"Aretim", "Eye3", "Blacksmith", "Dealer", "Guild Clerk", "Doctor", "Merchant", "Mysterious Merchant", "Itinerant", "Krit"},
         CurrentOption = {"None"},
         MultipleOptions = false,
         Flag = "Dropdown1",
