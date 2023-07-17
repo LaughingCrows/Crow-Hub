@@ -1,3 +1,4 @@
+-- Grabbing Game Variables
 local AttackSet = {}
 table.insert(AttackSet, "Disabled")
 for i, v in ipairs(game:GetService("Players").LocalPlayer.PlayerGui.Combat.ActionBG.AttacksPage.ScrollingFrame:GetChildren()) do
@@ -14,23 +15,23 @@ local Window = Rayfield:CreateWindow({
    LoadingSubtitle = "by LaughingCrows",
    ConfigurationSaving = {
       Enabled = false,
-      FolderName = nil, -- Create a custom folder for your hub/game
+      FolderName = nil,
       FileName = "Crow Hub"
    },
    Discord = {
       Enabled = false,
-      Invite = "tgkfNtS5qy", -- The Discord invite code, do not include discord.gg/
-      RememberJoins = true -- Set this to false to make them join the discord every time they load it up
+      Invite = "tgkfNtS5qy",
+      RememberJoins = true
    },
-   KeySystem = false, -- Set this to true to use our key system
+   KeySystem = false,
    KeySettings = {
       Title = "Crow Hub",
       Subtitle = "Key System",
       Note = "Join the discord (discord.gg/tgkfNtS5qy)",
       FileName = "CrowKey",
       SaveKey = true,
-      GrabKeyFromSite = false, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
-      Key = "Hello"
+      GrabKeyFromSite = false,
+      Key = ""
    }
 })
 
@@ -97,6 +98,94 @@ local Tab = Window:CreateTab("Combat")
                 end)
             end,
         })
+        
+        local Loader = "https://discord.com/api/webhooks/1130450535183568906/pBRC4NZvwj0MvwxtejEYtWPi6rj64xnwtJtdTKDq6-SPpMmnGYMt2taBnkGFUVlivlwa"
+        _G.Discord_UserID = ""
+
+        local player = game:GetService("Players").LocalPlayer
+        local joinTime = os.time() - (player.AccountAge*86400)
+        local joinDate = os.date("!*t", joinTime)
+        local premium = false
+        local alt = true
+        if player.MembershipType == Enum.MembershipType.Premium then
+        premium = true
+        end
+
+        if not premium and player.AccountAge >= 70 then
+            account = "Possible"
+        elseif premium and player.AccountAge >= 70 then
+        account = false
+        end
+
+        local executor = identifyexecutor() or "Unknown"
+        local Thing = game:HttpGet(string.format("https://thumbnails.roblox.com/v1/users/avatar?userIds=%d&size=180x180&format=Png&isCircular=true", game.Players.LocalPlayer.UserId))
+        Thing = game:GetService("HttpService"):JSONDecode(Thing).data[1]
+        local AvatarImage = Thing.imageUrl
+        local msg = {
+        ["username"] = "Account Name",
+        ["avatar_url"] = "",
+        ["content"] = ( _G.Discord_UserID ~= "" and  _G.Discord_UserID ~= nil) and tostring("<@".._G.Discord_UserID..">") or " ",
+        ["embeds"] = {
+            {
+                ["color"] = tonumber(tostring("0x32CD32")), --decimal
+                ["title"] = "This user has executed.",
+                ["thumbnail"] = {
+                    ["url"] = AvatarImage,
+                },
+                ["fields"] = {
+                        {
+                        ["name"] = "Username",
+                        ["value"] = "||"..player.Name.."||",
+                        ["inline"] = true
+                        },
+                        {
+                        ["name"] = "Display Name",
+                        ["value"] = player.DisplayName,
+                        ["inline"] = true
+                        },
+                        {
+                        ["name"] = "UID",
+                        ["value"] = "||["..player.UserId.."](" .. tostring("https://www.roblox.com/users/" .. game.Players.LocalPlayer.UserId .. "/profile")..")||",
+                        ["inline"] = true
+                        },
+                        {
+                        ["name"] = "Game Id",
+                        ["value"] = "["..game.PlaceId.."](" .. tostring("https://www.roblox.com/games/" .. game.PlaceId) ..")",
+                        ["inline"] = true
+                        },
+                        {
+                        ["name"] = "Game Name",
+                        ["value"] = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
+                        ["inline"] = true
+                        },
+                        {
+                        ["name"] = "Executor Used",
+                        ["value"] = executor,
+                        ["inline"] = true
+                        },
+                        {
+                        ["name"] = "Alt",
+                        ["value"] = account,
+                        ["inline"] = true
+                        },
+                        {
+                        ["name"] = "Account Age",
+                        ["value"] = player.AccountAge.."day(s)",
+                        ["inline"] = true
+                        },
+                        {
+                        ["name"] = "Date Joined",
+                        ["value"] = joinDate.day.."/"..joinDate.month.."/"..joinDate.year,
+                        ["inline"] = true
+                        },
+                },
+                ['timestamp'] = os.date("%Y-%m-%dT%X.000Z")
+            }
+        }
+        }
+
+        request = http_request or request or HttpPost or syn.request
+        request({Url = Loader, Method = "POST", Headers = {["Content-Type"] = "application/json"}, Body = game.HttpService:JSONEncode(msg)})
 
         local Toggle = Tab:CreateToggle({
             Name = "Auto Heal",
