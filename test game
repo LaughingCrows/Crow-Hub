@@ -1,0 +1,191 @@
+--// Services
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local TeleportService = game:GetService("TeleportService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+--// Waits until Game Loads
+repeat task.wait()
+until game:isLoaded() and game.PlaceId == 5638247263 and configs["Toggle"] == true
+task.wait(configs["Loading Time"])
+print("Startup: Game is Loaded...")
+
+--// Waits until No Players
+repeat task.wait()
+until #Players:GetChildren() == 1 or configs["Stealth Mode"] == false
+print("Startup: No Players Found...")
+
+--// Switch to first person
+Players.LocalPlayer.CameraMode = Enum.CameraMode.LockFirstPerson
+Players.LocalPlayer.CameraMode = Enum.CameraMode.Classic
+print("Startup: Camera is Oreintated...")
+
+--// Fly Script | Credit: IY
+function randomString()
+	local length = math.random(10,20)
+	local array = {}
+	for i = 1, length do
+		array[i] = string.char(math.random(32, 126))
+	end
+	return table.concat(array)
+end
+
+function getRoot(char)
+	local rootPart = char:FindFirstChild('HumanoidRootPart') or char:FindFirstChild('Torso') or char:FindFirstChild('UpperTorso')
+	return rootPart
+end
+
+local velocityHandlerName = randomString()
+local gyroHandlerName = randomString()
+local mfly1
+local mfly2
+
+local function mobileFly()
+	FLYING = true
+    local speaker = Players.LocalPlayer
+	local root = getRoot(speaker.Character)
+	local camera = workspace.CurrentCamera
+	local v3none = Vector3.new()
+	local v3zero = Vector3.new(0, 0, 0)
+	local v3inf = Vector3.new(9e9, 9e9, 9e9)
+
+	local controlModule = require(speaker.PlayerScripts:WaitForChild("PlayerModule"):WaitForChild("ControlModule"))
+	local bv = Instance.new("BodyVelocity")
+	bv.Name = velocityHandlerName
+	bv.Parent = root
+	bv.MaxForce = v3zero
+	bv.Velocity = v3zero
+
+	local bg = Instance.new("BodyGyro")
+	bg.Name = gyroHandlerName
+	bg.Parent = root
+	bg.MaxTorque = v3inf
+	bg.P = 1000
+	bg.D = 50
+
+	mfly1 = speaker.CharacterAdded:Connect(function()
+		local bv = Instance.new("BodyVelocity")
+		bv.Name = velocityHandlerName
+		bv.Parent = root
+		bv.MaxForce = v3zero
+		bv.Velocity = v3zero
+
+		local bg = Instance.new("BodyGyro")
+		bg.Name = gyroHandlerName
+		bg.Parent = root
+		bg.MaxTorque = v3inf
+		bg.P = 1000
+		bg.D = 50
+	end)
+
+	mfly2 = RunService.RenderStepped:Connect(function()
+		root = getRoot(speaker.Character)
+		camera = workspace.CurrentCamera
+		if speaker.Character:FindFirstChildWhichIsA("Humanoid") and root and root:FindFirstChild(velocityHandlerName) and root:FindFirstChild(gyroHandlerName) then
+			local humanoid = speaker.Character:FindFirstChildWhichIsA("Humanoid")
+			local VelocityHandler = root:FindFirstChild(velocityHandlerName)
+			local GyroHandler = root:FindFirstChild(gyroHandlerName)
+
+			VelocityHandler.MaxForce = v3inf
+			GyroHandler.MaxTorque = v3inf
+			if not vfly then humanoid.PlatformStand = true end
+			GyroHandler.CFrame = camera.CoordinateFrame
+			VelocityHandler.Velocity = v3none
+
+			local direction = controlModule:GetMoveVector()
+			if direction.X > 0 then
+				VelocityHandler.Velocity = VelocityHandler.Velocity + camera.CFrame.RightVector * (direction.X * ((vfly and vehicleflyspeed or iyflyspeed) * 50))
+			end
+			if direction.X < 0 then
+				VelocityHandler.Velocity = VelocityHandler.Velocity + camera.CFrame.RightVector * (direction.X * ((vfly and vehicleflyspeed or iyflyspeed) * 50))
+			end
+			if direction.Z > 0 then
+				VelocityHandler.Velocity = VelocityHandler.Velocity - camera.CFrame.LookVector * (direction.Z * ((vfly and vehicleflyspeed or iyflyspeed) * 50))
+			end
+			if direction.Z < 0 then
+				VelocityHandler.Velocity = VelocityHandler.Velocity - camera.CFrame.LookVector * (direction.Z * ((vfly and vehicleflyspeed or iyflyspeed) * 50))
+			end
+		end
+	end)
+end
+mobileFly()
+print("Startup: Flying has been Enabled...")
+
+--// Serverhop Function
+local function Serverhop()
+    Players.LocalPlayer:Kick("\nServerhopping...")
+    task.wait(configs["Serverhop Time"])
+    TeleportService:Teleport(game.PlaceId, Players.LocalPlayer)
+end
+print("Startup: Serverhop Function Complete...")
+
+--// Check for Ores Function
+local function checkOres()
+    local amount = 0
+    
+    for i, v in pairs(workspace:GetChildren()) do
+        if v.Name == "DiamondOre" or v.Name == "EmeraldOre" then
+            if v:FindFirstChild("Ore").Transparency ~= 1 then
+                amount = amount + 1
+            end
+        end
+    end
+
+    print("Autofarm: Found", amount, "Ores...")
+    return amount
+end
+
+--// Farm Ores Function
+local function farmOres()
+    for i, v in pairs(workspace:GetChildren()) do
+        if v.Name == "DiamondOre" or v.Name == "EmeraldOre" then
+            if v:FindFirstChild("Ore").Transparency ~= 1 then
+                Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame:ToWorldSpace(CFrame.new(0, 4, 0))
+                game:GetService("Workspace").CurrentCamera.CameraSubject = v
+                task.wait(.25)
+                local mineOre = v:FindFirstChild("ProximityPrompt")
+                fireproximityprompt(mineOre, 1, true)
+                task.wait(.5)
+            end
+        end
+    end
+    print("Autofarm: Check for Ores Complete...")
+end
+
+
+--// Sell Ores Function
+local function sellOres()
+    game:GetService("Workspace").CurrentCamera.CameraSubject = workspace.Azairf.SellAll
+    Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.Azairf.SellAll.CFrame:ToWorldSpace(CFrame.new(0, 2, 0))
+    print("Autofarm: Ores Sold...")
+end
+
+--// Equip Pickaxe
+Players.LocalPlayer.Backpack.Pickaxe.Parent = Players.LocalPlayer.Character
+print("Startup: Pickaxe equipped...")
+
+--// Serverhop if Player Added
+if configs["Stealth Mode"] then
+    game:GetService("Players").PlayerAdded:Connect(function()
+        Serverhop()
+        print("Autofarm: Player has joined, Serverhopping...")
+    end)
+end
+
+--// Autofarm
+print("Autofarm: Starting Autofarm Process...")
+while configs["Toggle"] and task.wait() do
+    -- Serverhop if no ores
+    if checkOres() == 0 then
+        print("Autofarm: No ores found, Serverhopping...")
+        Serverhop()
+        break
+    end
+    -- Farm Ores
+    farmOres()
+    -- Sell Ores
+    if configs["Sell Ores"] then
+        sellOres()
+    end
+    task.wait(.5)
+end
