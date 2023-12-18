@@ -1,5 +1,3 @@
-local Lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/dirt",true))()
-
 -- Services
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -8,7 +6,7 @@ local VirtualInputManager = game:GetService("VirtualInputManager")
 
 -- Variables
 local lp = Players.LocalPlayer
-
+local Lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/dirt",true))()
 local Table = {}
 
 -- Needs to be updated with more quests
