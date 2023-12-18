@@ -258,8 +258,8 @@ window:Button("Grab Coordinates",function()
     local pos = Players.LocalPlayer.Character.HumanoidRootPart.Position
     local roundedPos = math.round(pos.X) .. ", " .. math.round(pos.Y) .. ", " .. math.round(pos.Z)
     print(roundedPos)
- end)
+end)
 
- window:Button("Send Information",function()
+window:Button("Send Information",function()
     print("webhook sent")
- end)
+end)
