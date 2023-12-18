@@ -242,15 +242,15 @@ end)
    
 local Development = window:Section("Development")
 
-window:Box("Type:",{location = Table,flag = "Box", type = "", hold = "Numbers" --[[ PlaceHolderText ]]},function()
+window:Box("Type:",{location = Table,flag = "Box", type = "", hold = "Cubit or NPC" --[[ PlaceHolderText ]]},function()
     print(Table["Box"])
 end)
 
-window:Box("Name:",{location = Table,flag = "Box", type = "", hold = "Numbers" --[[ PlaceHolderText ]]},function()
+window:Box("Name:",{location = Table,flag = "Box", type = "", hold = "Name" --[[ PlaceHolderText ]]},function()
     print(Table["Box"])
 end)
 
-window:Box("Tasks:",{location = Table,flag = "Box", type = "number", hold = "Numbers" --[[ PlaceHolderText ]]},function()
+window:Box("Tasks:",{location = Table,flag = "Box", type = "number", hold = "Total of 1-3" --[[ PlaceHolderText ]]},function()
     print(Table["Box"])
 end)
 
@@ -258,8 +258,8 @@ window:Button("Grab Coordinates",function()
     local pos = Players.LocalPlayer.Character.HumanoidRootPart.Position
     local roundedPos = math.round(pos.X) .. ", " .. math.round(pos.Y) .. ", " .. math.round(pos.Z)
     print(roundedPos)
-end)
+ end)
 
-window:Button("Send Information",function()
+ window:Button("Send Information",function()
     print("webhook sent")
-end)
+ end)
