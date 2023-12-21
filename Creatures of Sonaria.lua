@@ -95,8 +95,8 @@ window:Dropdown("Dropdown", {location = Table, flag = "Dropdown",search = true, 
     selectedMob = Table["Dropdown"]
 end)
 
-window:Toggle("Toggle", {location = Table, flag = "Toggle"}, function()
-    while Table["Toggle"] and task.wait() do
+window:Toggle("Toggle", {location = Table, flag = "Toggle5"}, function()
+    while Table["Toggle5"] and task.wait() do
         lp.Character.HumanoidRootPart.CFrame = workspace.Event.Spawner.Spawner.MobRoots[Table["Dropdown"]].CFrame:ToWorldSpace(CFrame.new(0, -70, 0))
     end
 end)
