@@ -102,7 +102,7 @@ window:Toggle("Toggle", {location = Table, flag = "Toggle5"}, function()
 end)
 
 window:Button("Boss Teleport",function()
-    game:GetService("ReplicatedStorage").Remotes.Portal:FireServer("BossPortalStart")
+    ReplicatedStorage.Remotes.Portal:FireServer("BossPortalStart")
 end)
 
 window:Section("Teleports")
