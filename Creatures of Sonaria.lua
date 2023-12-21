@@ -72,8 +72,8 @@ local window = Lib:CreateWindow("Crow Hub")
 
 window:Section("Event")
 
-window:Toggle("Claim Candy Canes",{location = Table, flag = "Toggle"},function()
-    while Table["Toggle"] and task.wait() do
+window:Toggle("Claim Candy Canes",{location = Table, flag = "Toggle9"},function()
+    while Table["Toggle9"] and task.wait() do
         for i = 1, 40 do
             ReplicatedStorage.Remotes.CompleteForageableRemote:InvokeServer(i)
         end
