@@ -6,6 +6,7 @@ local VirtualInputManager = game:GetService("VirtualInputManager")
 
 -- Variables
 local lp = Players.LocalPlayer
+local eventType = "SlashEvent"
 local Lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/dirt",true))()
 local Table = {}
 
@@ -49,6 +50,24 @@ local QuestList = {
 }
 
 local QuestList2 = {}
+
+local chestTypes = {}
+
+for i, v in pairs(ReplicatedStorage.Models.Chests:GetChildren()) do
+    table.insert(chestTypes, v.Name)
+end
+
+local function collectChest(Hash)
+   for i = 1, 5 do
+       local args = {
+        [1] = "CollectChest",
+        [2] = Hash,
+        [3] = i
+    }
+    
+        game:GetService("ReplicatedStorage").RemoteEvent:FireServer(unpack(args))
+    end
+end
 
 for i, v in pairs(QuestList) do
     table.insert(QuestList2, i)
@@ -182,12 +201,12 @@ local function claimCubit(Cubit)
     float(false)
 end
 
-local function killMob(NPC)
+local function killMob(NPC, eventType)
     local args = {
         [1] = "Input",
         [2] = "",
         [3] = 0,
-        [4] = "SlashEvent",
+        [4] = eventType,
         [5] = NPC.HumanoidRootPart,
         [6] = math.huge
     }
@@ -195,12 +214,12 @@ local function killMob(NPC)
     lp.Character.Combat.RemoteEvent:FireServer(unpack(args))
 end
 
-local function killAuraLoop()
+local function killAuraLoop(eventType)
     for i, v in pairs(workspace.NPCs:GetChildren()) do
         if lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") then 
             if v:FindFirstChild("Enemy") and v:FindFirstChild("HumanoidRootPart") then
                 if (lp.Character.HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude <= Table["Slider"] then
-                    killMob(v)
+                    killMob(v, eventType)
                 end
             end
         end
@@ -213,12 +232,27 @@ local KillAura = window:Section("Kill Aura")
 
 window:Toggle("Toggle", {location = Table, flag = "Toggle"}, function()
     while task.wait() and Table["Toggle"] do
-        killAuraLoop()
+        killAuraLoop(eventType)
     end
+end)
+
+window:Dropdown("Dropdown", {location = Table,flag = "Dropdown", search = true, list = {"SlashEvent", "PoundEvent"}, PlayerList = false},function()
+   eventType = Table["Dropdown"]
 end)
 
 window:Slider("Distance", {location = Table, min = 1, max = 60, default = 30, precise = true, flag = "Slider"}, function()
    print(Table["Slider"])
+end)
+
+local Loot = window:Section("Chests")
+
+window:Button("Auto Chest Collect",function()
+    workspace.Projectiles.ChildAdded:Connect(function(instance)
+        if table.find(chestTypes, instance.Name) then
+            local hashValue = instance:GetAttribute("Hash")
+            collectChest(hashValue)
+        end
+    end)
 end)
 
 local AutoFarm = window:Section("Auto Farm")
