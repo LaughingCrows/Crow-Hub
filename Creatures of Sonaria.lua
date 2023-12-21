@@ -101,11 +101,11 @@ window:Toggle("Toggle", {location = Table, flag = "Toggle5"}, function()
     end
 end)
 
-window:Button("Boss Teleport",function()
+window:Section("Teleports")
+
+window:Button("Boss Teleport", function()
     ReplicatedStorage.Remotes.Portal:FireServer("BossPortalStart")
 end)
-
-window:Section("Teleports")
 
 window:Button("Meat Teleport",function()
     lp.Character.HumanoidRootPart.CFrame = getNearestResource("Meat").Food.CFrame:ToWorldSpace(CFrame.new(0, 10, 0))
