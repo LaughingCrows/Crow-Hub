@@ -97,7 +97,11 @@ end)
 
 window:Toggle("Toggle", {location = Table, flag = "Toggle5"}, function()
     while Table["Toggle5"] and task.wait() do
-        lp.Character.HumanoidRootPart.CFrame = workspace.Event.Spawner.Spawner.MobRoots[Table["Dropdown"]].CFrame:ToWorldSpace(CFrame.new(0, -70, 0))
+        if workspace.Event.Spawner.Spawner.MobRoots:FindFirstChild([Table["Dropdown"]]) then
+            lp.Character.HumanoidRootPart.CFrame = workspace.Event.Spawner.Spawner.MobRoots[Table["Dropdown"]].CFrame:ToWorldSpace(CFrame.new(0, -70, 0))
+        else
+            lp.Character.HumanoidRootPart.CFrame = CFrame.new(1407, 4835, 3139)
+        end
     end
 end)
 
@@ -189,16 +193,6 @@ window:Toggle("Player Kill Aura", {location = Table, flag = "Toggle3"}, function
         end
     end
 end)
-
-for _, table in pairs(blockedRemotes) do
-    local old; old = hookmetamethod(game, "__namecall", function(remote, ...)
-        local args = {...}
-        if remote.Name == table then
-            return
-        end
-        return old(remote, ...)
-    end)
-end
 
 window:Button("Block All Damage",function()
     for _, table in pairs(blockedRemotes) do
