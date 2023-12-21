@@ -5,7 +5,7 @@ local Players = game:GetService("Players")
 
 -- Variables
 local lp = Players.LocalPlayer
-local Lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/dirt",true))()
+local Lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/dirt", true))()
 local Table = {}
 local selectedMob = nil
 
@@ -97,7 +97,7 @@ end)
 
 window:Toggle("Toggle", {location = Table, flag = "Toggle5"}, function()
     while Table["Toggle5"] and task.wait() do
-        if workspace.Event.Spawner.Spawner.MobRoots:FindFirstChild([Table["Dropdown"]]) then
+        if workspace.Event.Spawner.Spawner.MobRoots:FindFirstChild(Table["Dropdown"]) then
             lp.Character.HumanoidRootPart.CFrame = workspace.Event.Spawner.Spawner.MobRoots[Table["Dropdown"]].CFrame:ToWorldSpace(CFrame.new(0, -70, 0))
         else
             lp.Character.HumanoidRootPart.CFrame = CFrame.new(1407, 4835, 3139)
