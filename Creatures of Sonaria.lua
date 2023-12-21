@@ -80,7 +80,7 @@ window:Toggle("Claim Candy Canes",{location = Table, flag = "Toggle"},function()
     end
 end)
 
-window:Toggle("Claim Candy Canes",{location = Table, flag = "Toggle4"},function()
+window:Toggle("Auto Claim Tokens",{location = Table, flag = "Toggle4"},function()
     while Table["Toggle4"] and task.wait() do
         for _, v in pairs(Workspace.Interactions.SpawnedTokens:GetChildren()) do
             if v then
