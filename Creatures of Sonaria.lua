@@ -14,7 +14,7 @@ local function getNearestResource(type)
     if type == "Meat" then   
         for _, v in pairs(workspace.Interactions.Food:GetChildren()) do
             if string.find(v.Name, "Carcass") or string.find(v.Name, "Ribs") then
-                if v:FindFirstChild("Food") then
+                if v:FindFirstChild("Food") and not v.Food:FindFirstChild("Flies") then
                     local foodDist = lp:DistanceFromCharacter(v.Food.Position)
                     if foodDist < distance then
                         resource = v
@@ -28,7 +28,7 @@ local function getNearestResource(type)
     elseif type == "Water" then
         for _, v in pairs(workspace.Interactions.Lakes:GetChildren()) do
             if string.find(v.Name, "Lake") and v:FindFirstChild("WaterZone") then
-                local waterDist = lp:DistanceFromCharacter(v.Position)
+                local waterDist = lp:DistanceFromCharacter(v.WaterZone.Position)
                 if waterDist < distance then
                     resource = v
                     distance = waterDist
@@ -51,10 +51,6 @@ local function getNearestResource(type)
         return resource
     end
  end
-
-local function getWater()
-    lp.Character.HumanoidRootPart.CFrame = CFrame.new(1080, 466, 676)
-end
 
 local window = Lib:CreateWindow("Creatures of Sonaria")
 
@@ -85,7 +81,7 @@ end)
 window:Section("Survival")
     
 window:Button("Fast Eat",function()
-    for i = 1, 30 do 
+    for i = 1, 10 do 
         local args = {
             [1] = getNearestResource("Meat")
         }
@@ -95,7 +91,7 @@ window:Button("Fast Eat",function()
 end)
 
 window:Button("Fast Drink",function()
-    for i = 1, 30 do 
+    for i = 1, 10 do 
         local args = {
             [1] = getNearestResource("Water")
         }
@@ -105,7 +101,7 @@ window:Button("Fast Drink",function()
 end)
 
 window:Button("Fast Hide Scent",function()
-    for i = 1, 30 do 
+    for i = 1, 10 do 
         local args = {
             [1] = getNearestResource("Mud")
         }
