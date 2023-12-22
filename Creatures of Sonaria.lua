@@ -195,13 +195,11 @@ window:Toggle("Player Kill Aura", {location = Table, flag = "Toggle3"}, function
 end)
 
 window:Button("Block All Damage",function()
-    for _, table in pairs(blockedRemotes) do
-        local old; old = hookmetamethod(game, "__namecall", function(remote, ...)
-            local args = {...}
-            if remote.Name == table then
-                return
-            end
-            return old(remote, ...)
-        end)
-    end
+    local old; old = hookmetamethod(game, "__namecall", newcclosure(function(remote, ...)
+        local args = {...}
+        if table.find(blockedRemotes, remote.Name) then
+            return
+        end
+        return old(remote, ...)
+    end))
 end)
