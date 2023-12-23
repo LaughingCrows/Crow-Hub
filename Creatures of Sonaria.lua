@@ -9,8 +9,8 @@ local EmergencyHealthVal = 1000
 local lp = Players.LocalPlayer
 local Lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/dirt", true))()
 local Table = {}
-local teleportMobDist = -150
-local teleportPlayerDist = -150
+local teleportMobDist = -140
+local teleportPlayerDist = -140
 local Regions = {}
 
 for i, v in pairs(game:GetService("ReplicatedStorage").Storage.Regions:GetChildren()) do
@@ -117,7 +117,7 @@ window:Toggle("Boss Autofarm", {location = Table, flag = "Boss Autofarm"}, funct
     end
 end)
 
-window:Slider("Distance",{location = Table, min = 1, max = -300, default = -150, precise = true, flag = "Mob Distance"}, function()
+window:Slider("Distance",{location = Table, min = 1, max = -300, default = -140, precise = true, flag = "Mob Distance"}, function()
    teleportMobDist = Table["Mob Distance"]
 end)
 
@@ -168,7 +168,7 @@ end)
 window:Dropdown("Select Player", {location = Table, flag = "Select Player", search = true, list = nil, PlayerList = true}, function()
 end)
 
-window:Slider("Distance",{location = Table, min = 1, max = -300, default = -150, precise = true, flag = "Player Distance"}, function()
+window:Slider("Distance",{location = Table, min = 1, max = -300, default = -140, precise = true, flag = "Player Distance"}, function()
     teleportPlayerDist = Table["Player Distance"]
  end)
 
