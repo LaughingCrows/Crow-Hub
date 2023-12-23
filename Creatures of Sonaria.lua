@@ -140,7 +140,7 @@ window:Button("Mud Teleport",function()
 end)
 
 window:Dropdown("Region Teleport", {location = Table, flag = "Region Teleport", search = true, list = Regions, PlayerList = false}, function()
-    lp.Character.HumanoidRootPart.CFrame = game:GetService("ReplicatedStorage").Storage.Regions[Table["Region Teleport"]].CFrame:ToWorldSpace(CFrame.new(0, 0, 0))
+    lp.Character.HumanoidRootPart.CFrame = game:GetService("ReplicatedStorage").Storage.Regions[Table["Region Teleport"]].CFrame:ToWorldSpace(CFrame.new(-1000, 0, 0))
 end)
 
 window:Section("PVP")
