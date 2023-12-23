@@ -128,7 +128,9 @@ window:Button("Boss Room Teleport", function()
 end)
 
 window:Button("Meat Teleport",function()
-    lp.Character.HumanoidRootPart.CFrame = getNearestResource("Meat").Food.CFrame:ToWorldSpace(CFrame.new(0, 10, 0))
+    if getNearestResource("Meat") then
+        lp.Character.HumanoidRootPart.CFrame = getNearestResource("Meat").Food.CFrame:ToWorldSpace(CFrame.new(0, 10, 0))
+    end
 end)
 
 window:Button("Water Teleport",function()
@@ -136,7 +138,9 @@ window:Button("Water Teleport",function()
 end)
 
 window:Button("Mud Teleport",function()
-    lp.Character.HumanoidRootPart.CFrame = getNearestResource("Mud").CFrame:ToWorldSpace(CFrame.new(0, 10, 0))
+    if getNearestResource("Mud") then
+        lp.Character.HumanoidRootPart.CFrame = getNearestResource("Mud").CFrame:ToWorldSpace(CFrame.new(0, 10, 0))
+    end
 end)
 
 window:Dropdown("Region Teleport", {location = Table, flag = "Region Teleport", search = true, list = Regions, PlayerList = false}, function()
@@ -176,9 +180,11 @@ window:Section("Survival")
 
 window:Toggle("Emergency TP", {location = Table, flag = "Emergency TP"}, function()
     RunService.Heartbeat:Connect(function()
-        if Table["Emergency TP"] and lp.Character.Data:GetAttribute("h") <= EmergencyHealthVal then
-            EmergencyTP = true
-            lp.Character.HumanoidRootPart.CFrame = CFrame.new(1820, 5303, 3156)
+        if Table["Emergency TP"] and lp.Character then
+            if lp.Character.Data:GetAttribute("h") <= EmergencyHealthVal then
+                EmergencyTP = true
+                lp.Character.HumanoidRootPart.CFrame = CFrame.new(1820, 5303, 3156)
+            end
         elseif EmergencyTP then -- acts as a debounce I think?
             EmergencyTP = false
         end
@@ -220,8 +226,10 @@ window:Toggle("Auto Mud Roll", {location = Table, flag = "Auto Mud Roll"}, funct
 end)
 
 window:Toggle("Auto Hide Scent", {location = Table, flag = "Auto Hide Scent"}, function()
-    while Table["Auto Hide Scent"] and not lp.Character.Ailments:GetAttribute("HideScent") and task.wait() do
-       ReplicatedStorage.Remotes.HideScent:FireServer()
+    while Table["Auto Hide Scent"] and task.wait() do
+        if not lp.Character.Ailments:GetAttribute("HideScent") then
+            ReplicatedStorage.Remotes.HideScent:FireServer()
+        end
     end
 end)
 
