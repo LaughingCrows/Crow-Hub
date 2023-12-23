@@ -4,11 +4,18 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
 -- Variables
+local EmergencyTP = false
+local EmergencyHealthVal = 1000
 local lp = Players.LocalPlayer
 local Lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/dirt", true))()
 local Table = {}
-local teleportMobDist = -100
-local teleportPlayerDist = -300
+local teleportMobDist = -150
+local teleportPlayerDist = -150
+local Regions = {}
+
+for i, v in pairs(game:GetService("ReplicatedStorage").Storage.Regions:GetChildren()) do
+    table.insert(Regions, v.Name)
+end
 
 local blockedRemotes = {
     "OxygenRemote",
@@ -18,10 +25,6 @@ local blockedRemotes = {
     "LavaSelfDamage",
     "TornadoSelfDamage",
     "MobProjectileDamageRemote"
-}
-
-local mobsList = {
-    "WinterYetiBoss"
 }
 
 local function getNearestResource(type)
@@ -106,7 +109,7 @@ end)
 
 window:Toggle("Boss Autofarm", {location = Table, flag = "Boss Autofarm"}, function()
     while Table["Boss Autofarm"] and task.wait() do
-        if workspace.Event.Spawner.Spawner.MobRoots:FindFirstChild("WinterYetiBoss") then
+        if workspace.Event.Spawner.Spawner.MobRoots:FindFirstChild("WinterYetiBoss") and not EmergencyTP then
             lp.Character.HumanoidRootPart.CFrame = workspace.Event.Spawner.Spawner.MobRoots.WinterYetiBoss.CFrame:ToWorldSpace(CFrame.new(0, teleportMobDist, 0))
         else
             lp.Character.HumanoidRootPart.CFrame = CFrame.new(1820, 5303, 3156)
@@ -114,7 +117,7 @@ window:Toggle("Boss Autofarm", {location = Table, flag = "Boss Autofarm"}, funct
     end
 end)
 
-window:Slider("Distance",{location = Table, min = 1, max = -200, default = -100, precise = true, flag = "Mob Distance"}, function()
+window:Slider("Distance",{location = Table, min = 1, max = -300, default = -150, precise = true, flag = "Mob Distance"}, function()
    teleportMobDist = Table["Mob Distance"]
 end)
 
@@ -136,6 +139,10 @@ window:Button("Mud Teleport",function()
     lp.Character.HumanoidRootPart.CFrame = getNearestResource("Mud").CFrame:ToWorldSpace(CFrame.new(0, 10, 0))
 end)
 
+window:Dropdown("Region Teleport", {location = Table, flag = "Region Teleport", search = true, list = Regions, PlayerList = false}, function()
+    lp.Character.HumanoidRootPart.CFrame = game:GetService("ReplicatedStorage").Storage.Regions[Table["Region Teleport"]].CFrame:ToWorldSpace(CFrame.new(0, 0, 0))
+end)
+
 window:Section("PVP")
 
 window:Toggle("Player Kill Aura", {location = Table, flag = "Player Kill Aura"}, function()
@@ -152,33 +159,34 @@ end)
 
 window:Toggle("TP under Player", {location = Table, flag = "TP under Player"}, function()
     while Table["TP under Player"] and task.wait() do
-        if workspace.Characters:FindFirstChild(Table["Player List"]):FindFirstChild("HumanoidRootPart") then
-            lp.Character.HumanoidRootPart.CFrame = workspace.Characters[Table["Player List"]].HumanoidRootPart.CFrame:ToWorldSpace(CFrame.new(0, teleportPlayerDist, 0))
+        if workspace.Characters[Table["Select Player"]]:FindFirstChild("HumanoidRootPart") then
+            lp.Character.HumanoidRootPart.CFrame = workspace.Characters[Table["Select Player"]].HumanoidRootPart.CFrame:ToWorldSpace(CFrame.new(0, teleportPlayerDist, 0))
         end
     end
 end)
 
-window:Dropdown("Player List",{location = Table, flag = "Player List",search = true, list = nil, PlayerList = true}, function()
+window:Dropdown("Select Player", {location = Table, flag = "Select Player", search = true, list = nil, PlayerList = true}, function()
 end)
 
-window:Slider("Distance",{location = Table, min = 1, max = -150, default = -100, precise = true, flag = "Player Distance"}, function()
+window:Slider("Distance",{location = Table, min = 1, max = -300, default = -150, precise = true, flag = "Player Distance"}, function()
     teleportPlayerDist = Table["Player Distance"]
  end)
 
 window:Section("Survival")
-window:Toggle("Infinite Stamina", {location = Table, flag = "Infinite Stamina"}, function()
-    lp.Character.Data:SetAttribute("sr", math.huge)
-    lp.Character.Data:SetAttribute("st", math.huge)
 
-    lp.Character.Data:GetAttributeChangedSignal("sr"):Connect(function()
-        task.wait()
-        lp.Character.Data:SetAttribute("sr", math.huge)
+window:Toggle("Emergency TP", {location = Table, flag = "Emergency TP"}, function()
+    RunService.Heartbeat:Connect(function()
+        if Table["Emergency TP"] and lp.Character.Data:GetAttribute("h") <= EmergencyHealthVal then
+            EmergencyTP = true
+            lp.Character.HumanoidRootPart.CFrame = CFrame.new(1820, 5303, 3156)
+        elseif EmergencyTP then -- acts as a debounce I think?
+            EmergencyTP = false
+        end
     end)
+end)
 
-    lp.Character.Data:GetAttributeChangedSignal("sr"):Connect(function()
-        task.wait()
-        lp.Character.Data:SetAttribute("st", math.huge)
-    end)
+window:Box("HP Value:", {location = Table, flag = "Emergenct Health Value", type = "number", hold = "1000 Default"}, function()
+   EmergencyHealthVal = tonumber(Table["Emergenct Health Value"])
 end)
 
 window:Toggle("Auto Eat", {location = Table, flag = "Auto Eat"}, function()
@@ -215,6 +223,21 @@ window:Toggle("Auto Hide Scent", {location = Table, flag = "Auto Hide Scent"}, f
     while Table["Auto Hide Scent"] and not lp.Character.Ailments:GetAttribute("HideScent") and task.wait() do
        ReplicatedStorage.Remotes.HideScent:FireServer()
     end
+end)
+
+window:Toggle("Infinite Stamina", {location = Table, flag = "Infinite Stamina"}, function()
+    lp.Character.Data:SetAttribute("sr", math.huge)
+    lp.Character.Data:SetAttribute("st", math.huge)
+
+    lp.Character.Data:GetAttributeChangedSignal("sr"):Connect(function()
+        task.wait()
+        lp.Character.Data:SetAttribute("sr", math.huge)
+    end)
+
+    lp.Character.Data:GetAttributeChangedSignal("sr"):Connect(function()
+        task.wait()
+        lp.Character.Data:SetAttribute("st", math.huge)
+    end)
 end)
 
 window:Toggle("Block All Damage", {location = Table, flag = "Block All Damage"}, function()
