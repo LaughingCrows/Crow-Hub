@@ -5,7 +5,7 @@ local Players = game:GetService("Players")
 
 -- Variables
 local EmergencyTP = false
-local EmergencyHealthVal = 1000
+local EmergencyHealthVal = 2000
 local lp = Players.LocalPlayer
 local Lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/dirt", true))()
 local Table = {}
@@ -26,6 +26,8 @@ local blockedRemotes = {
     "TornadoSelfDamage",
     "MobProjectileDamageRemote"
 }
+
+local staminaAttributes = {"sr", "st", "tak"}
 
 local function getNearestResource(type)
     local resource = nil 
@@ -70,7 +72,7 @@ local function getNearestResource(type)
         
         return resource
     end
- end
+end
 
 local window = Lib:CreateWindow("Crow Hub")
 
@@ -191,7 +193,7 @@ window:Toggle("Emergency TP", {location = Table, flag = "Emergency TP"}, functio
     end)
 end)
 
-window:Box("HP Value:", {location = Table, flag = "Emergenct Health Value", type = "number", hold = "1000 Default"}, function()
+window:Box("HP Value:", {location = Table, flag = "Emergenct Health Value", type = "number", hold = "2000 Default"}, function()
    EmergencyHealthVal = tonumber(Table["Emergenct Health Value"])
 end)
 
@@ -234,18 +236,21 @@ window:Toggle("Auto Hide Scent", {location = Table, flag = "Auto Hide Scent"}, f
 end)
 
 window:Toggle("Infinite Stamina", {location = Table, flag = "Infinite Stamina"}, function()
-    lp.Character.Data:SetAttribute("sr", math.huge)
-    lp.Character.Data:SetAttribute("st", math.huge)
-
-    lp.Character.Data:GetAttributeChangedSignal("sr"):Connect(function()
-        task.wait()
-        lp.Character.Data:SetAttribute("sr", math.huge)
-    end)
-
-    lp.Character.Data:GetAttributeChangedSignal("sr"):Connect(function()
-        task.wait()
-        lp.Character.Data:SetAttribute("st", math.huge)
-    end)
+    for _, v in staminaAttributes do
+        if v ~= "tak" then
+            lp.Character.Data:SetAttribute(v, math.huge)
+            lp.Character.Data:GetAttributeChangedSignal(v):Connect(function()
+                task.wait()
+                lp.Character.Data:SetAttribute(v, math.huge)
+            end)
+        else
+            lp.Character.Data:SetAttribute(v, -math.huge)
+            lp.Character.Data:GetAttributeChangedSignal(v):Connect(function()
+                task.wait()
+                lp.Character.Data:SetAttribute(v, -math.huge)
+            end)
+        end
+    end
 end)
 
 window:Toggle("Block All Damage", {location = Table, flag = "Block All Damage"}, function()
@@ -256,4 +261,86 @@ window:Toggle("Block All Damage", {location = Table, flag = "Block All Damage"},
         end
         return old(remote, ...)
     end))
+end)
+
+window:Section("Stat Modifiers")
+
+window:Slider("Bite Cooldown",{location = Table, min = 0, max = 3, default = 0, precise = true, flag = "Bite Cooldown"}, function()
+    local getAttribute = lp.Character.Data:GetAttributeChangedSignal("BiteCooldown")
+
+    local function setAttribute()
+        task.wait()
+        lp.Character.Data:SetAttribute("BiteCooldown", Table["Bite Cooldown"])
+    end
+
+    if getAttribute:Connect(setAttribute).Connected ~= nil then
+        getAttribute:Connect(setAttribute):Disconnect()
+    end
+
+    lp.Character.Data:SetAttribute("BiteCooldown", Table["Bite Cooldown"])
+    getAttribute:Connect(setAttribute)
+end)
+
+window:Slider("Walk Speed",{location = Table, min = 1, max = 300, default = nil, precise = true, flag = "Walk Speed"}, function()
+    local getAttribute = lp.Character.Data:GetAttributeChangedSignal("s")
+
+    local function setAttribute()
+        task.wait()
+        lp.Character.Data:SetAttribute("s", Table["Walk Speed"])
+    end
+
+    if getAttribute:Connect(setAttribute).Connected ~= nil then
+        getAttribute:Connect(setAttribute):Disconnect()
+    end
+
+    lp.Character.Data:SetAttribute("s", Table["Walk Speed"])
+    getAttribute:Connect(setAttribute)
+end)
+
+window:Slider("Sprint Speed",{location = Table, min = 1, max = 300, default = nil, precise = true, flag = "Sprint Speed"}, function()
+    local getAttribute = lp.Character.Data:GetAttributeChangedSignal("ss")
+
+    local function setAttribute()
+        task.wait()
+        lp.Character.Data:SetAttribute("ss", Table["Sprint Speed"])
+    end
+
+    if getAttribute:Connect(setAttribute).Connected ~= nil then
+        getAttribute:Connect(setAttribute):Disconnect()
+    end
+
+    lp.Character.Data:SetAttribute("ss", Table["Sprint Speed"])
+    getAttribute:Connect(setAttribute)
+end)
+
+window:Slider("Fly Speed",{location = Table, min = 1, max = 300, default = nil, precise = true, flag = "Fly Speed"}, function()
+    local getAttribute = lp.Character.Data:GetAttributeChangedSignal("fs")
+
+    local function setAttribute()
+        task.wait()
+        lp.Character.Data:SetAttribute("fs", Table["Fly Speed"])
+    end
+
+    if getAttribute:Connect(setAttribute).Connected ~= nil then
+        getAttribute:Connect(setAttribute):Disconnect()
+    end
+
+    lp.Character.Data:SetAttribute("fs", Table["Fly Speed"])
+    getAttribute:Connect(setAttribute)
+end)
+
+window:Slider("Turn Radius",{location = Table, min = -300, max = 10, default = nil, precise = true, flag = "Turn Radius"}, function()
+    local getAttribute = lp.Character.Data:GetAttributeChangedSignal("tr")
+
+    local function setAttribute()
+        task.wait()
+        lp.Character.Data:SetAttribute("tr", Table["Turn Radius"])
+    end
+
+    if getAttribute:Connect(setAttribute).Connected ~= nil then
+        getAttribute:Connect(setAttribute):Disconnect()
+    end
+
+    lp.Character.Data:SetAttribute("tr", Table["Turn Radius"])
+    getAttribute:Connect(setAttribute)
 end)
