@@ -7,7 +7,8 @@ local Players = game:GetService("Players")
 local lp = Players.LocalPlayer
 local Lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/dirt", true))()
 local Table = {}
-local selectedMob = nil
+local teleportMobDist = -100
+local teleportPlayerDist = -100
 
 local blockedRemotes = {
     "OxygenRemote",
@@ -72,16 +73,16 @@ local window = Lib:CreateWindow("Crow Hub")
 
 window:Section("Event")
 
-window:Toggle("Claim Candy Canes",{location = Table, flag = "Toggle9"},function()
-    while Table["Toggle9"] and task.wait() do
+window:Toggle("Claim Candy Canes",{location = Table, flag = "Claim Candy Canes"},function()
+    while Table["Claim Candy Canes"] and task.wait() do
         for i = 1, 40 do
             ReplicatedStorage.Remotes.CompleteForageableRemote:InvokeServer(i)
         end
     end
 end)
 
-window:Toggle("Auto Claim Tokens",{location = Table, flag = "Toggle4"},function()
-    while Table["Toggle4"] and task.wait() do
+window:Toggle("Auto Claim Tokens",{location = Table, flag = "Auto Claim Tokens"},function()
+    while Table["Auto Claim Tokens"] and task.wait() do
         for _, v in pairs(Workspace.Interactions.SpawnedTokens:GetChildren()) do
             if v then
                 ReplicatedStorage.Remotes.GetSpawnedTokenRemote:InvokeServer()
@@ -91,23 +92,35 @@ window:Toggle("Auto Claim Tokens",{location = Table, flag = "Toggle4"},function(
     end
 end)
 
-window:Dropdown("Dropdown", {location = Table, flag = "Dropdown",search = true, list = mobsList, PlayerList = false}, function()
-    selectedMob = Table["Dropdown"]
-end)
-
-window:Toggle("Toggle", {location = Table, flag = "Toggle5"}, function()
-    while Table["Toggle5"] and task.wait() do
-        if workspace.Event.Spawner.Spawner.MobRoots:FindFirstChild(Table["Dropdown"]) then
-            lp.Character.HumanoidRootPart.CFrame = workspace.Event.Spawner.Spawner.MobRoots[Table["Dropdown"]].CFrame:ToWorldSpace(CFrame.new(0, -70, 0))
-        else
-            lp.Character.HumanoidRootPart.CFrame = CFrame.new(1407, 4835, 3139)
+window:Toggle("Mob Kill Aura", {location = Table, flag = "Mob Kill Aura"}, function()
+    while Table["Mob Kill Aura"] and task.wait() do
+        for _, v in pairs(workspace.Event.Spawner.Spawner.MobRoots:GetChildren()) do
+            if v then
+                ReplicatedStorage.Remotes.MobDamageRemote:FireServer({v})
+                ReplicatedStorage.Remotes.MobDamageRemoteBreath:FireServer({v})
+                ReplicatedStorage.Remotes.MobDamageRemoteWhip:FireServer({v})
+            end
         end
     end
 end)
 
+window:Toggle("Boss Autofarm", {location = Table, flag = "Boss Autofarm"}, function()
+    while Table["Boss Autofarm"] and task.wait() do
+        if workspace.Event.Spawner.Spawner.MobRoots:FindFirstChild("WinterYetiBoss") then
+            lp.Character.HumanoidRootPart.CFrame = workspace.Event.Spawner.Spawner.MobRoots.WinterYetiBoss.CFrame:ToWorldSpace(CFrame.new(0, teleportMobDist, 0))
+        else
+            lp.Character.HumanoidRootPart.CFrame = CFrame.new(1820, 5303, 3156)
+        end
+    end
+end)
+
+window:Slider("Distance",{location = Table, min = 1, max = -200, default = -100, precise = true, flag = "Mob Distance"}, function()
+   teleportMobDist = Table["Mob Distance"]
+end)
+
 window:Section("Teleports")
 
-window:Button("Boss Teleport", function()
+window:Button("Boss Room Teleport", function()
     ReplicatedStorage.Remotes.Portal:FireServer("BossPortalStart")
 end)
 
@@ -125,7 +138,34 @@ end)
 
 window:Section("Survival")
 
-window:Button("Infinite Stamina",function()
+window:Toggle("Player Kill Aura", {location = Table, flag = "Player Kill Aura"}, function()
+    while Table["Player Kill Aura"] and task.wait() do
+        for i, v in pairs(Players:GetPlayers()) do
+            if v ~= lp and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                ReplicatedStorage.Remotes.CharactersDamageRemote:FireServer({v.Character})
+                ReplicatedStorage.Remotes.CharactersDamageRemoteBreath:FireServer({v.Character})
+                ReplicatedStorage.Remotes.CharactersDamageRemoteWhip:FireServer({v.Character})
+            end
+        end
+    end
+end)
+
+window:Toggle("TP under Player", {location = Table, flag = "TP under Player"}, function()
+    while Table["TP under Player"] and task.wait() do
+        if workspace.Characters:FindFirstChild(Table["Player List"]):FindFirstChild("HumanoidRootPart") then
+            lp.Character.HumanoidRootPart.CFrame = workspace.Characters[Table["Player List"]].HumanoidRootPart.CFrame:ToWorldSpace(CFrame.new(0, teleportPlayerDist, 0))
+        end
+    end
+end)
+
+window:Dropdown("Player List",{location = Table, flag = "Player List",search = true, list = nil, PlayerList = true}, function()
+end)
+
+window:Slider("Distance",{location = Table, min = 1, max = -150, default = -100, precise = true, flag = "Player Distance"}, function()
+    teleportPlayerDist = Table["Player Distance"]
+ end)
+
+window:Toggle("Infinite Stamina", {location = Table, flag = "Infinite Stamina"}, function()
     lp.Character.Data:SetAttribute("sr", math.huge)
     lp.Character.Data:SetAttribute("st", math.huge)
 
@@ -140,8 +180,8 @@ window:Button("Infinite Stamina",function()
     end)
 end)
 
-window:Button("Fast Eat",function()
-    for i = 1, 10 do 
+window:Toggle("Auto Eat", {location = Table, flag = "Auto Eat"}, function()
+    while Table["Auto Eat"] and task.wait() do
         local args = {
             [1] = getNearestResource("Meat")
         }
@@ -150,8 +190,8 @@ window:Button("Fast Eat",function()
     end
 end)
 
-window:Button("Fast Drink",function()
-    for i = 1, 10 do 
+window:Toggle("Auto Drink", {location = Table, flag = "Auto Drink"}, function()
+    while Table["Auto Drink"] and task.wait() do
         local args = {
             [1] = getNearestResource("Water")
         }
@@ -160,8 +200,8 @@ window:Button("Fast Drink",function()
     end
 end)
 
-window:Button("Fast Hide Scent",function()
-    for i = 1, 10 do 
+window:Toggle("Auto Mud Roll", {location = Table, flag = "Auto Mud Roll"}, function()
+    while Table["Auto Mud Roll"] and task.wait() do
         local args = {
             [1] = getNearestResource("Mud")
         }
@@ -170,34 +210,16 @@ window:Button("Fast Hide Scent",function()
     end
 end)
 
-window:Toggle("Mob Kill Aura", {location = Table, flag = "Toggle2"}, function()
-    while Table["Toggle2"] and task.wait() do
-        for _, v in pairs(workspace.Event.Spawner.Spawner.MobRoots:GetChildren()) do
-            if v then
-                ReplicatedStorage.Remotes.MobDamageRemote:FireServer({v})
-                ReplicatedStorage.Remotes.MobDamageRemoteBreath:FireServer({v})
-                ReplicatedStorage.Remotes.MobDamageRemoteWhip:FireServer({v})
-            end
-        end
+window:Toggle("Auto Hide Scent", {location = Table, flag = "Auto Hide Scent"}, function()
+    while Table["Auto Hide Scent"] and not lp.Character.Ailments:GetAttribute("HideScent") and task.wait() do
+       ReplicatedStorage.Remotes.HideScent:FireServer()
     end
 end)
 
-window:Toggle("Player Kill Aura", {location = Table, flag = "Toggle3"}, function()
-    while Table["Toggle3"] and task.wait() do
-        for i, v in pairs(Players:GetPlayers()) do
-            if v ~= lp and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
-                ReplicatedStorage.Remotes.CharactersDamageRemote:FireServer({v.Character})
-                ReplicatedStorage.Remotes.CharactersDamageRemoteBreath:FireServer({v.Character})
-                ReplicatedStorage.Remotes.CharactersDamageRemoteWhip:FireServer({v.Character})
-            end
-        end
-    end
-end)
-
-window:Button("Block All Damage",function()
+window:Toggle("Block All Damage", {location = Table, flag = "Block All Damage"}, function()
     local old; old = hookmetamethod(game, "__namecall", newcclosure(function(remote, ...)
         local args = {...}
-        if table.find(blockedRemotes, remote.Name) then
+        if table.find(blockedRemotes, remote.Name) and Table["Block All Damage"] then
             return
         end
         return old(remote, ...)
