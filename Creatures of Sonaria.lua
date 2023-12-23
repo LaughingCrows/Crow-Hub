@@ -8,7 +8,7 @@ local lp = Players.LocalPlayer
 local Lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/dirt", true))()
 local Table = {}
 local teleportMobDist = -100
-local teleportPlayerDist = -100
+local teleportPlayerDist = -300
 
 local blockedRemotes = {
     "OxygenRemote",
