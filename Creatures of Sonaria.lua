@@ -136,7 +136,7 @@ window:Button("Mud Teleport",function()
     lp.Character.HumanoidRootPart.CFrame = getNearestResource("Mud").CFrame:ToWorldSpace(CFrame.new(0, 10, 0))
 end)
 
-window:Section("Survival")
+window:Section("PVP")
 
 window:Toggle("Player Kill Aura", {location = Table, flag = "Player Kill Aura"}, function()
     while Table["Player Kill Aura"] and task.wait() do
@@ -165,6 +165,7 @@ window:Slider("Distance",{location = Table, min = 1, max = -150, default = -100,
     teleportPlayerDist = Table["Player Distance"]
  end)
 
+window:Section("Survival")
 window:Toggle("Infinite Stamina", {location = Table, flag = "Infinite Stamina"}, function()
     lp.Character.Data:SetAttribute("sr", math.huge)
     lp.Character.Data:SetAttribute("st", math.huge)
