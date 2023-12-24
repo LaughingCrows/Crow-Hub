@@ -110,16 +110,19 @@ window:Toggle("Snowman Autofarm",{location = Table, flag = "Snowman Autofarm"},f
 end)
 
 window:Toggle("Present Autofarm",{location = Table, flag = "Present Autofarm"},function()
-    while Table["Present Autofarm"] and task.wait() do
-        for _, v in pairs(workspace.Interactions.SpawnedDeliveryObjects:GetChildren()) do
-            if v then
-                ReplicatedStorage.Remotes.GetSpawnedDeliveryObjectRemote:InvokeServer(v.Name)
-                v:Destroy()
-                task.wait()
-            else
-                break
+    task.spawn(function()
+        while Table["Present Autofarm"] and task.wait() do
+            for _, v in pairs(workspace.Interactions.SpawnedDeliveryObjects:GetChildren()) do
+                if v then
+                    ReplicatedStorage.Remotes.GetSpawnedDeliveryObjectRemote:InvokeServer(v.Name)
+                    v:Destroy()
+                    task.wait()
+                end
             end
         end
+    end)
+
+    while Table["Present Autofarm"] and task.wait() do
         for _, v in DeliveryPoints do
             if getPresentAmount() then
                 ReplicatedStorage.Remotes.DeliveryDropoffEvent:FireServer(workspace.Event[v])
