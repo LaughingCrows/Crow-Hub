@@ -58,7 +58,7 @@ local function getNearestResource(type)
     if type == "Meat" then   
         for _, v in pairs(workspace.Interactions.Food:GetChildren()) do
             if string.find(v.Name, "Carcass") or string.find(v.Name, "Ribs") then
-                if v:FindFirstChild("Food") and not v.Food:FindFirstChild("Flies") then
+                if v:GetAttribute("Value") ~= 0 and v:FindFirstChild("Food") and not v.Food:FindFirstChild("Flies") then
                     local foodDist = lp:DistanceFromCharacter(v.Food.Position)
                     if foodDist < distance then
                         resource = v
