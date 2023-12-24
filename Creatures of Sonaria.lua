@@ -110,14 +110,15 @@ end)
 
 window:Toggle("Present Autofarm",{location = Table, flag = "Present Autofarm"},function()
     while Table["Present Autofarm"] and task.wait() do
-        for i, v in pairs(workspace.Interactions.SpawnedDeliveryObjects:GetChildren()) do
+        for _, v in pairs(workspace.Interactions.SpawnedDeliveryObjects:GetChildren()) do
             if v then
                 ReplicatedStorage.Remotes.GetSpawnedDeliveryObjectRemote:InvokeServer(v.Name)
                 v:Destroy()
+            else
+                break
             end
         end
-
-        for i, v in DeliveryPoints do
+        for _, v in DeliveryPoints do
             if getPresentAmount() then
                 ReplicatedStorage.Remotes.DeliveryDropoffEvent:FireServer(workspace.Event[v])
             end
