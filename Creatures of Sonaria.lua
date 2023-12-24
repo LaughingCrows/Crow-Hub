@@ -469,3 +469,13 @@ window:Slider("Turn Radius",{location = Table, min = 0, max = -300, default = ni
     lp.Character.Data:SetAttribute("tr", Table["Turn Radius"])
     getAttribute:Connect(setAttribute)
 end)
+
+window:Button("Serverhop",function()
+    local PlaceID = tostring(game.PlaceId)
+    local Servers = game.HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/"..PlaceID.."/servers/Public?sortOrder=Asc&limit=100"))
+    for i,v in pairs(Servers.data) do
+        if v.playing ~= v.maxPlayers then
+            game:GetService('TeleportService'):TeleportToPlaceInstance(game.PlaceId, v.id)
+        end
+    end
+end)
