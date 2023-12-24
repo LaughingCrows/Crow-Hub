@@ -104,6 +104,7 @@ window:Toggle("Snowman Autofarm",{location = Table, flag = "Snowman Autofarm"},f
     while Table["Snowman Autofarm"] and task.wait() do
         for i = 1, 40 do
             ReplicatedStorage.Remotes.CompleteForageableRemote:InvokeServer(i)
+            task.wait()
         end
     end
 end)
