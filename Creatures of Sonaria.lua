@@ -35,8 +35,8 @@ local function getPresentAmount()
     local greenPresent = lp.PlayerGui.Data.MiscItems.PresentGreen.Value
     local redPresent = lp.PlayerGui.Data.MiscItems.PresentRed.Value
     local whitePresent = lp.PlayerGui.Data.MiscItems.PresentWhite.Value
-    
-    if (greenPresent or redPresent or whitePresent) >= 1 then
+
+    if (greenPresent >= 1) or (redPresent >= 1) or (whitePresent >= 1) then
         return true
     end
 end
@@ -46,7 +46,7 @@ local function getDoughAmount()
     local peppermintDough = lp.PlayerGui.Data.MiscItems.PeppermintDough.Value
     local sprinkleDough = lp.PlayerGui.Data.MiscItems.SprinkleDough.Value
     
-    if (cookieDough or peppermintDough or sprinkleDough) >= 5 then
+    if (cookieDough >= 5) or (peppermintDough >= 5) or (sprinkleDough >= 5) then
         return true
     end
 end
@@ -114,6 +114,7 @@ window:Toggle("Present Autofarm",{location = Table, flag = "Present Autofarm"},f
             if v then
                 ReplicatedStorage.Remotes.GetSpawnedDeliveryObjectRemote:InvokeServer(v.Name)
                 v:Destroy()
+                task.wait()
             else
                 break
             end
