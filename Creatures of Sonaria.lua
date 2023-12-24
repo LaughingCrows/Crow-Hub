@@ -29,6 +29,28 @@ local blockedRemotes = {
 
 local staminaAttributes = {"sr", "st", "tak"}
 
+local DeliveryPoints = {"DeliveryPointGreen", "DeliveryPointRed", "DeliveryPointWhite"}
+
+local function getPresentAmount()
+    local greenPresent = lp.PlayerGui.Data.MiscItems.PresentGreen.Value
+    local redPresent = lp.PlayerGui.Data.MiscItems.PresentRed.Value
+    local whitePresent = lp.PlayerGui.Data.MiscItems.PresentWhite.Value
+    
+    if (greenPresent or redPresent or whitePresent) >= 1 then
+        return true
+    end
+end
+
+local function getDoughAmount()
+    local cookieDough = lp.PlayerGui.Data.MiscItems.CookieDough.Value
+    local peppermintDough = lp.PlayerGui.Data.MiscItems.PeppermintDough.Value
+    local sprinkleDough = lp.PlayerGui.Data.MiscItems.SprinkleDough.Value
+    
+    if (cookieDough or peppermintDough or sprinkleDough) >= 5 then
+        return true
+    end
+end
+
 local function getNearestResource(type)
     local resource = nil 
     local distance = math.huge
@@ -78,10 +100,36 @@ local window = Lib:CreateWindow("Crow Hub")
 
 window:Section("Event")
 
-window:Toggle("Claim Candy Canes",{location = Table, flag = "Claim Candy Canes"},function()
-    while Table["Claim Candy Canes"] and task.wait() do
+window:Toggle("Snowman Autofarm",{location = Table, flag = "Snowman Autofarm"},function()
+    while Table["Snowman Autofarm"] and task.wait() do
         for i = 1, 40 do
             ReplicatedStorage.Remotes.CompleteForageableRemote:InvokeServer(i)
+        end
+    end
+end)
+
+window:Toggle("Present Autofarm",{location = Table, flag = "Present Autofarm"},function()
+    while Table["Present Autofarm"] and task.wait() do
+        for i, v in pairs(workspace.Interactions.SpawnedDeliveryObjects:GetChildren()) do
+            if v then
+                ReplicatedStorage.Remotes.GetSpawnedDeliveryObjectRemote:InvokeServer(v.Name)
+                v:Destroy()
+            end
+        end
+
+        for i, v in DeliveryPoints do
+            if getPresentAmount() then
+                ReplicatedStorage.Remotes.DeliveryDropoffEvent:FireServer(workspace.Event[v])
+            end
+        end
+    end
+end)
+
+window:Toggle("Cookie Autofarm",{location = Table, flag = "Cookie Autofarm"},function()
+    while Table["Cookie Autofarm"] and task.wait() do
+        if getDoughAmount() then
+            ReplicatedStorage.Remotes.JerryLoadUp:FireServer()
+            ReplicatedStorage.Remotes.JerryUnbox:InvokeServer()
         end
     end
 end)
@@ -150,6 +198,61 @@ window:Dropdown("Region Teleport", {location = Table, flag = "Region Teleport", 
 end)
 
 window:Section("PVP")
+
+local billboardGUI = Instance.new("BillboardGui")
+billboardGUI.Active = true
+billboardGUI.AlwaysOnTop = true
+billboardGUI.ClipsDescendants = true
+billboardGUI.LightInfluence = 1
+billboardGUI.Size = UDim2.new(0, 120, 0, 50)
+billboardGUI.StudsOffset = Vector3.new(0, 1, 0)
+billboardGUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+local textLabel = Instance.new("TextLabel")
+textLabel.Font = Enum.Font.Unknown
+textLabel.Text = "nameHolder"
+textLabel.TextColor3 = Color3.new(1, 1, 1)
+textLabel.TextScaled = true
+textLabel.TextSize = 14
+textLabel.TextStrokeTransparency = 0.5
+textLabel.TextWrapped = true
+textLabel.BackgroundColor3 = Color3.new(1, 1, 1)
+textLabel.BackgroundTransparency = 1
+textLabel.BorderColor3 = Color3.new(0.105882, 0.164706, 0.207843)
+textLabel.Size = UDim2.new(1, 0, 1, 0)
+textLabel.Parent = billboardGUI
+
+window:Toggle("Player ESP", {location = Table, flag = "Player ESP"}, function()
+    while task.wait() do
+        for i, v in pairs(Players:GetChildren()) do
+            if Table["Player ESP"] and v.Character and v.Character:FindFirstChild("HumanoidRootPart") and not v.Character.HumanoidRootPart:FindFirstChild("nameESP") then
+                if v ~= Players.LocalPlayer then
+                    local billboardGUIClone = billboardGUI:Clone()
+                    billboardGUIClone.Name = "nameESP"
+                    billboardGUIClone.TextLabel.Text = v.Name
+                    billboardGUIClone.Parent = v.Character:FindFirstChild("HumanoidRootPart")
+                end
+            elseif Table["Player ESP"] == false and v.Character and v.Character:FindFirstChild("HumanoidRootPart") and v.Character.HumanoidRootPart:FindFirstChild("nameESP") then
+                v.Character.HumanoidRootPart:FindFirstChild("nameESP"):Destroy()
+            end
+        end
+    end
+    
+    Players.PlayerAdded:Connect(function(player)
+        if Table["Player ESP"] then
+            if player.Character and player.Character:FindFirstChild("HumanoidRootPart") and not player.Character.HumanoidRootPart:FindFirstChild("nameESP") then
+                if player ~= Players.LocalPlayer then
+                    local billboardGUIClone = billboardGUI:Clone()
+                    billboardGUIClone.Name = "nameESP"
+                    billboardGUIClone.TextLabel.Text = player.Name
+                    billboardGUIClone.Parent = v.Character:FindFirstChild("HumanoidRootPart")            
+                end
+            end
+        elseif Table["Player ESP"] == false and v.Character and v.Character:FindFirstChild("HumanoidRootPart") and v.Character.HumanoidRootPart:FindFirstChild("nameESP") then
+            v.Character.HumanoidRootPart:FindFirstChild("nameESP"):Destroy()
+        end
+    end)
+end)
 
 window:Toggle("Player Kill Aura", {location = Table, flag = "Player Kill Aura"}, function()
     while Table["Player Kill Aura"] and task.wait() do
@@ -235,6 +338,12 @@ window:Toggle("Auto Hide Scent", {location = Table, flag = "Auto Hide Scent"}, f
     end
 end)
 
+window:Toggle("Auto Ungrab", {location = Table, flag = "Auto Ungrab"}, function()
+    while Table["Auto Ungrab"] and task.wait() do
+        ReplicatedStorage.Remotes.Ungrab:FireServer()
+    end
+end)
+
 window:Toggle("Infinite Stamina", {location = Table, flag = "Infinite Stamina"}, function()
     for _, v in staminaAttributes do
         if v ~= "tak" then
@@ -265,7 +374,17 @@ end)
 
 window:Section("Stat Modifiers")
 
-window:Slider("Bite Cooldown",{location = Table, min = 0, max = 3, default = 0, precise = true, flag = "Bite Cooldown"}, function()
+window:Toggle("Noclip", {location = Table, flag = "Noclip"}, function()
+    if Table["Noclip"] == false then
+        lp.Character:FindFirstChild("Hitbox").CanCollide = true
+    end
+    
+    while Table["Noclip"] and task.wait() do
+        lp.Character:FindFirstChild("Hitbox").CanCollide = false
+    end
+end)
+
+window:Slider("Bite Cooldown",{location = Table, min = -3, max = 3, default = nil, precise = true, flag = "Bite Cooldown"}, function()
     local getAttribute = lp.Character.Data:GetAttributeChangedSignal("BiteCooldown")
 
     local function setAttribute()
@@ -329,7 +448,7 @@ window:Slider("Fly Speed",{location = Table, min = 1, max = 300, default = nil, 
     getAttribute:Connect(setAttribute)
 end)
 
-window:Slider("Turn Radius",{location = Table, min = -300, max = 10, default = nil, precise = true, flag = "Turn Radius"}, function()
+window:Slider("Turn Radius",{location = Table, min = 0, max = -300, default = nil, precise = true, flag = "Turn Radius"}, function()
     local getAttribute = lp.Character.Data:GetAttributeChangedSignal("tr")
 
     local function setAttribute()
