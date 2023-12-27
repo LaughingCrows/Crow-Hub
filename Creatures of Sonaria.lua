@@ -158,6 +158,7 @@ window:Toggle("Mob Kill Aura", {location = Table, flag = "Mob Kill Aura"}, funct
                 ReplicatedStorage.Remotes.MobDamageRemote:FireServer({v})
                 ReplicatedStorage.Remotes.MobDamageRemoteBreath:FireServer({v})
                 ReplicatedStorage.Remotes.MobDamageRemoteWhip:FireServer({v})
+                print(v.Name)
             end
         end
     end
@@ -168,7 +169,7 @@ window:Toggle("Boss Autofarm", {location = Table, flag = "Boss Autofarm"}, funct
         if workspace.Event.Spawner.Spawner.MobRoots:FindFirstChild("WinterYetiBoss") and not EmergencyTP then
             lp.Character.HumanoidRootPart.CFrame = workspace.Event.Spawner.Spawner.MobRoots.WinterYetiBoss.CFrame:ToWorldSpace(CFrame.new(0, teleportMobDist, 0))
         else
-            lp.Character.HumanoidRootPart.CFrame = CFrame.new(1820, 5303, 3156)
+            lp.Character.HumanoidRootPart.CFrame = CFrame.new(1800, 5183, 3195)
         end
     end
 end)
@@ -359,10 +360,10 @@ window:Toggle("Infinite Stamina", {location = Table, flag = "Infinite Stamina"},
                 lp.Character.Data:SetAttribute(v, math.huge)
             end)
         else
-            lp.Character.Data:SetAttribute(v, -math.huge)
+            lp.Character.Data:SetAttribute(v, 0)
             lp.Character.Data:GetAttributeChangedSignal(v):Connect(function()
                 task.wait()
-                lp.Character.Data:SetAttribute(v, -math.huge)
+                lp.Character.Data:SetAttribute(v, 0)
             end)
         end
     end
