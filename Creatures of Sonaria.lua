@@ -9,7 +9,7 @@ local EmergencyHealthVal = 2000
 local lp = Players.LocalPlayer
 local Lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/dirt", true))()
 local Table = {}
-local teleportMobDist = -140
+local teleportMobDist = -85
 local teleportPlayerDist = -140
 local Regions = {}
 
@@ -174,7 +174,7 @@ window:Toggle("Boss Autofarm", {location = Table, flag = "Boss Autofarm"}, funct
     end
 end)
 
-window:Slider("Distance",{location = Table, min = 1, max = -300, default = -140, precise = true, flag = "Mob Distance"}, function()
+window:Slider("Distance",{location = Table, min = 1, max = -300, default = -85, precise = true, flag = "Mob Distance"}, function()
    teleportMobDist = Table["Mob Distance"]
 end)
 
@@ -347,7 +347,7 @@ end)
 
 window:Toggle("Auto Agression", {location = Table, flag = "Auto Agression"}, function()
     while Table["Auto Agression"] and task.wait() do
-        if not lp.Character.Ailments:GetAttribute("Aggression") then
+        if not lp.Character.Ailments:GetAttribute("Aggression") or lp.Character.Ailments:GetAttribute("Aggression") <= 3 then
             ReplicatedStorage.Remotes.StateAilment:FireServer("Aggression")
         end
     end
