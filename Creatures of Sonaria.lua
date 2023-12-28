@@ -345,6 +345,14 @@ window:Toggle("Auto Hide Scent", {location = Table, flag = "Auto Hide Scent"}, f
     end
 end)
 
+window:Toggle("Auto Agression", {location = Table, flag = "Auto Agression"}, function()
+    while Table["Auto Agression"] and task.wait() do
+        if not lp.Character.Ailments:GetAttribute("Aggression") then
+            ReplicatedStorage.Remotes.StateAilment:FireServer("Aggression")
+        end
+    end
+end)
+
 window:Toggle("Auto Ungrab", {location = Table, flag = "Auto Ungrab"}, function()
     while Table["Auto Ungrab"] and task.wait() do
         ReplicatedStorage.Remotes.Ungrab:FireServer()
